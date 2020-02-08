@@ -1,5 +1,13 @@
 For Windows: Ctrl+Insert to copy and Shift+Insert to paste.
 
+https://training.linuxfoundation.org/wp-content/uploads/2019/05/Important-Tips-CKA-CKAD-4.30.19.pdf
+
+Candidates may use their Chrome or Chromium browser to open one additional tab in order to
+access assets at https://kubernetes.io/docs/ and its subdomain, https://github.com/kubernetes/
+and its subdomains, or https://kubernetes.io/blog/. No other tabs may be opened and no other
+sites may be navigated to. The allowed sites above may contain links that point to external sites.
+It is the responsibility of the candidate not to click on any links that cause them to navigate to a
+domain that is not allowed.
 
 source: https://codeburst.io/the-ckad-browser-terminal-10fab2e8122e
 
