@@ -1,0 +1,34 @@
+source: https://codeburst.io/the-ckad-browser-terminal-10fab2e8122e
+
+Bash Aliases
+First thing when I got access to the terminal I did define aliases:
+
+
+vim ~/.bashrc
+# then add those two:
+alias k=kubectl
+alias kn='kubectl config set-context --current --namespace '
+
+vi ~/.vimrc
+# then add these two lines to the file
+set tabstop=2
+set expandtab # use spaces for tabs
+
+When in vim you can press Esc and type :set number or :set nonumber + Enter to toggle line numbers.
+
+You can also just jump to a line number with Esc :22 + Enter.
+
+For basic searching:
+
+/pattern - search forward for pattern
+?pattern - search backward
+n - repeat forward search
+N - repeat backward
+
+:s/string/replacewiththisstring/g  -- single replacement
+:%s/string/replacewiththisstring/g  --all occurances
+
+Mark lines: Esc+V (then arrow keys)
+Copy marked lines: y
+Cut marked lines: d
+Past lines: p or P
