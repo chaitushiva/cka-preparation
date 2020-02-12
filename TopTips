@@ -57,4 +57,6 @@ done
 
 kubectl get pods --all-namespaces| grep Evicted |  $(awk '{print "kubectl -n " $1 " delete pod "$2}')
 
+MUST READ
 
+https://stackoverflow.com/questions/56486023/does-kubernetes-consider-the-current-memory-usage-when-scheduling-pods
