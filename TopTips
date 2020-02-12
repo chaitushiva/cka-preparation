@@ -60,3 +60,14 @@ kubectl get pods --all-namespaces| grep Evicted |  $(awk '{print "kubectl -n " $
 MUST READ
 
 https://stackoverflow.com/questions/56486023/does-kubernetes-consider-the-current-memory-usage-when-scheduling-pods
+
+
+apiserver: main component exposing APIs for all the other master components
+scheduler: uses information in the pod spec to decide on which node to run a pod
+controller-manager: responsible for node management (detecting if a node fails), pod replication, and endpoint creation
+etcd: key/value store used for storing all internal cluster data
+Node components are worker machines in Kubernetes, managed by the master. Each node contains the necessary components to run pods:
+
+kubelet: handles all communication between the master and the node on which it is running. It interfaces with the container runtime to deploy and monitor containers
+kube-proxy: is in charge with maintaining network rules for the node. It also handles communication between pods, nodes, and the outside world.
+container runtime: runs containers on the node.
