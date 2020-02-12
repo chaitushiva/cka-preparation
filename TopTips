@@ -45,3 +45,16 @@ Cut marked lines: d
 Past lines: p or P
 
 challenges here https://codeburst.io/kubernetes-ckad-weekly-challenges-overview-and-tips-7282b36a2681
+
+
+kubectl get pods --all-namespaces | grep Running | awk '{print "some text " $1 "some more text " $2}'
+
+kubectl get pods -n namespace | grep Terminating | while read line; do 
+pod_name=$(echo $line | awk '{print $2}' ) name_space=$(echo $line | awk 
+'{print $1}' ); kubectl delete pods $pod_name -n $name_space --grace-period=0 --force; 
+done
+
+
+kubectl get pods --all-namespaces| grep Evicted |  $(awk '{print "kubectl -n " $1 " delete pod "$2}')
+
+
