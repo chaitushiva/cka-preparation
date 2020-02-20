@@ -71,3 +71,13 @@ Node components are worker machines in Kubernetes, managed by the master. Each n
 kubelet: handles all communication between the master and the node on which it is running. It interfaces with the container runtime to deploy and monitor containers
 kube-proxy: is in charge with maintaining network rules for the node. It also handles communication between pods, nodes, and the outside world.
 container runtime: runs containers on the node.
+
+
+kubectl get pods -o wide --sort-by=.spec.nodeName | grep -i Terminating
+
+k describe pod rounding-deployment-8dcd499c-7np24 | grep -i 'Last State' -A 4
+    Last State:     Terminated
+      Reason:       Error
+      Exit Code:    137
+      Started:      Tue, 11 Feb 2020 09:35:00 -0500
+      Finished:     Tue, 11 Feb 2020 09:36:14 -0500
