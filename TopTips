@@ -75,7 +75,7 @@ container runtime: runs containers on the node.
 
 kubectl get pods -o wide --sort-by=.spec.nodeName | grep -i Terminating
 
-k describe pod rounding-deployment-8dcd499c-7np24 | grep -i 'Last State' -A 4
+k describe pod xxx-deployment-8dcd499c-7np24 | grep -i 'Last State' -A 4
     Last State:     Terminated
       Reason:       Error
       Exit Code:    137
