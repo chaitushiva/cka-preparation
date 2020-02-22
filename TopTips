@@ -94,3 +94,5 @@ kubectl -n kube-system get po coredns-6955765f44-nv6tw -o jsonpath='{.items[*].s
 kubectl expose deploy nginx --port 8073 --target-port 80 --type NodePort
 
 sudo iptables-save  | grep nginx
+
+kubectl run -it --image=busybox debug --restart=Never -- sh
