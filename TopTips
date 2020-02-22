@@ -81,3 +81,6 @@ k describe pod xxx-deployment-8dcd499c-7np24 | grep -i 'Last State' -A 4
       Exit Code:    137
       Started:      Tue, 11 Feb 2020 09:35:00 -0500
       Finished:     Tue, 11 Feb 2020 09:36:14 -0500
+
+
+kubectl get po -o jsonpath='{range .items[*]}{.spec.containers[*].image}{"\n"}{end}'
