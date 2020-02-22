@@ -84,3 +84,10 @@ k describe pod xxx-deployment-8dcd499c-7np24 | grep -i 'Last State' -A 4
 
 
 kubectl get po -o jsonpath='{range .items[*]}{.spec.containers[*].image}{"\n"}{end}'
+
+kubectl -n kube-system get po -o jsonpath='{range .items[*]} {.spec.containers[*].image}{"\n"}{end}'
+
+kubectl get po coredns-6955765f44-nv6tw -n kube-system -o yaml | grep -i nodeName -B 10
+
+kubectl run --generator=run-pod/v1 --image=nginx nginx --dry-run -o yaml > 3.yaml
+kubectl -n kube-system get po coredns-6955765f44-nv6tw -o jsonpath='{.items[*].spec.containers[*].image}'
