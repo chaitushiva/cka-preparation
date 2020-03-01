@@ -96,3 +96,9 @@ kubectl expose deploy nginx --port 8073 --target-port 80 --type NodePort
 sudo iptables-save  | grep nginx
 
 kubectl run -it --image=busybox debug --restart=Never -- sh
+
+for item in client-cert client-key-data certificate-authority-data; 
+do 
+  echo $item; 
+  grep $item ~/.kube/config | awk '{print $2}' | base64 -d > $item.pem; 
+done
