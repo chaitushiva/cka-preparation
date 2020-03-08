@@ -116,3 +116,11 @@ resources:
               secret: ${ENCRYPTION_KEY}
       - identity: {}
 EOF
+
+Aditya R Shttps://vocon-it.com/2019/08/08/cka-labs-11-kubernetes-services/
+10:37 PMAditya R Skubectl label node <nodename> <labelname>-
+11:23 PMAditya R Skubectl label nodes master vip=true --overwrite
+11:33 PMAditya R Skubectl taint node master node-role.kubernetes.io/master-
+11:34 PMAditya R Skubectl label nodes master vip-
+
+
