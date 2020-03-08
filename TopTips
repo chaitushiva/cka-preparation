@@ -123,4 +123,8 @@ Aditya R Shttps://vocon-it.com/2019/08/08/cka-labs-11-kubernetes-services/
 11:33 PMAditya R Skubectl taint node master node-role.kubernetes.io/master-
 11:34 PMAditya R Skubectl label nodes master vip-
 
+PODs can be specified to tolerate certain taints. 
+We have the following cases for tolerations: 
+operator=“Exists“ and no other parameter –> will tolerate any taint operator=“Exists“ and key=“myKey“ –> will tolerate any taint with the „myKey“ key 
+operator=“Equal“ and key=“myKey“ and value=“myValue“ –> will tolerate taints with the corresponding key and value operator=“Equal“ and key=“myKey“ and value=“myValue“ and effect=“NoSchedule“ –> will tolerate taints with the corresponding key, value, and 
 
