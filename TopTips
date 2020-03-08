@@ -128,3 +128,5 @@ We have the following cases for tolerations:
 operator=“Exists“ and no other parameter –> will tolerate any taint operator=“Exists“ and key=“myKey“ –> will tolerate any taint with the „myKey“ key 
 operator=“Equal“ and key=“myKey“ and value=“myValue“ –> will tolerate taints with the corresponding key and value operator=“Equal“ and key=“myKey“ and value=“myValue“ and effect=“NoSchedule“ –> will tolerate taints with the corresponding key, value, and 
 
+
+kubectl top pods --all-namespaces --containers
