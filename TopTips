@@ -167,3 +167,5 @@ sudo systemctl status firewalld #redhat centos
 sudo systemctl stop firewalld #redhat, centos
 sudo ufw status verbose #ubuntu
 sudo ufw disable #ubuntu
+
+https://stackoverflow.com/questions/52720380/kubernetes-api-server-is-not-starting-on-a-single-kubeadm-cluster/52724543
