@@ -131,6 +131,8 @@ operator=“Equal“ and key=“myKey“ and value=“myValue“ –> will toler
 
 kubectl top pods --all-namespaces --containers
 
+03/24/2020
+
 ================================================================
  Troubleshooting Troubleshooting Troubleshooting Troubleshooting
 ===============================================================
@@ -169,3 +171,5 @@ sudo ufw status verbose #ubuntu
 sudo ufw disable #ubuntu
 
 https://stackoverflow.com/questions/52720380/kubernetes-api-server-is-not-starting-on-a-single-kubeadm-cluster/52724543
+
+https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux_atomic_host/7/html/getting_started_with_kubernetes/troubleshooting_kubernetes
