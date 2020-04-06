@@ -27,6 +27,8 @@ set expandtab # use spaces for tabs
 
 When in vim you can press Esc and type :set number or :set nonumber + Enter to toggle line numbers.
 
+
+
 You can also just jump to a line number with Esc :22 + Enter.
 
 For basic searching:
@@ -307,3 +309,9 @@ $ kubectl get service elasticsearch --output json
 kubectl get service kubernetes --output jsonpath='{.spec.ports[?(@.name=="https")].targetPort}'
 
 kubectl get nodes -o=jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.status.images[*].names[1]}{"\n"}{end}'
+
+***********************************************************************************************************************************
+***********************************************************************************************************************************
+****************https://github.com/chaitushiva/dockerlabs/blob/master/kubernetes/cheatsheets/kubectl.md ********************************
+***********************************************************************************************************************************
+***********************************************************************************************************************************
