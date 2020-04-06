@@ -261,3 +261,49 @@ input
 [ 10,20,30,43,56,22,21 ]
 $[?( @ > 40)] 
 
+kubectl get pods -l name=web -o=jsonpath='{.items..metadata.name}'
+
+kubectl get deploy/nginx-deploy -o yaml>test.yaml
+
+kubectl get nodes -o=jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.status.nodeInfo.osImage}{"\n"}{end}'
+
+
+$ kubectl get service elasticsearch --output json
+{
+    "apiVersion": "v1",
+    "kind": "Service",
+    "metadata": {
+        ... stuff that really has nothing to do with my question ...
+    },
+    "spec": {
+        "clusterIP": "10.0.0.174",
+        "ports": [
+             {
+                "name": "http",
+                "nodePort": 31041,
+                "port": 9200,
+                "protocol": "TCP",
+                "targetPort": 9200
+            },
+            {
+                "name": "transport",
+                "nodePort": 31987,
+                "port": 9300,
+                "protocol": "TCP",
+                "targetPort": 9300
+            }
+        ],
+        "selector": {
+            "component": "elasticsearch"
+        },
+        "sessionAffinity": "None",
+        "type": "NodePort"
+    },
+    "status": {
+        "loadBalancer": {}
+    }
+}
+
+kubectl get service kubernetes --output jsonpath='{.spec.ports[?(@.name=="https")].targetPort}'
+
+kubectl get nodes -o=jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.status.images[*].names[1]}{"\n"}{end}'
