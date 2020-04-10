@@ -89,6 +89,9 @@ kubectl get po -o jsonpath='{range .items[*]}{.spec.containers[*].image}{"\n"}{e
 
 kubectl -n kube-system get po -o jsonpath='{range .items[*]} {.spec.containers[*].image}{"\n"}{end}'
 
+kubectl get pods --sort-by=.status.containerStatuses[*].restartCount
+kubectl get pods --sort-by=.status.phase
+
 kubectl get po coredns-6955765f44-nv6tw -n kube-system -o yaml | grep -i nodeName -B 10
 
 kubectl run --generator=run-pod/v1 --image=nginx nginx --dry-run -o yaml > 3.yaml
