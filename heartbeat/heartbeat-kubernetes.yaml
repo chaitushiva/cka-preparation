@@ -1,4 +1,3 @@
-
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -28,7 +27,7 @@ spec:
         ]
         env:
         - name: ELASTICSEARCH_HOST
-          value: 192.168.1.163
+          value: elk.home.com
         - name: ELASTICSEARCH_PORT
           value: "9200"
         - name: ELASTICSEARCH_USERNAME
@@ -56,6 +55,9 @@ spec:
           mountPath: /etc/heartbeat.yml
           readOnly: true
           subPath: heartbeat.yml
+        - name: modules
+          mountPath: /usr/share/heartbeat/monitors.d
+          readOnly: true
         - name: data
           mountPath: /usr/share/heartbeat/data
       volumes:
@@ -63,6 +65,10 @@ spec:
         configMap:
           defaultMode: 0600
           name: heartbeat-deployment-config
+      - name: modules
+        configMap:
+          defaultMode: 0600
+          name: heartbeat-deployment-modules
       - name: data
         hostPath:
           path: /var/lib/heartbeat-data
