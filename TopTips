@@ -51,6 +51,10 @@ Past lines: p or P
 challenges here https://codeburst.io/kubernetes-ckad-weekly-challenges-overview-and-tips-7282b36a2681
 
 
+
+k get get-contexts
+k get get-contexts -o name
+
 kubectl get pods --all-namespaces | grep Running | awk '{print "some text " $1 "some more text " $2}'
 
 kubectl get pods -n namespace | grep Terminating | while read line; do 
@@ -320,3 +324,4 @@ kubectl get nodes -o=jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.status.i
 ****************https://github.com/chaitushiva/dockerlabs/blob/master/kubernetes/cheatsheets/kubectl.md ********************************
 ***********************************************************************************************************************************
 ***********************************************************************************************************************************
+
