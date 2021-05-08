@@ -1,3 +1,5 @@
+
+https://www.digitalocean.com/community/tutorials/how-to-install-and-configure-elasticsearch-on-centos-7
 For Windows: Ctrl+Insert to copy and Shift+Insert to paste.
 
 https://training.linuxfoundation.org/wp-content/uploads/2019/05/Important-Tips-CKA-CKAD-4.30.19.pdf
@@ -27,6 +29,8 @@ set expandtab # use spaces for tabs
 
 When in vim you can press Esc and type :set number or :set nonumber + Enter to toggle line numbers.
 
+
+
 You can also just jump to a line number with Esc :22 + Enter.
 
 For basic searching:
@@ -47,5 +51,277 @@ Past lines: p or P
 challenges here https://codeburst.io/kubernetes-ckad-weekly-challenges-overview-and-tips-7282b36a2681
 
 
+
 k get get-contexts
 k get get-contexts -o name
+
+kubectl get pods --all-namespaces | grep Running | awk '{print "some text " $1 "some more text " $2}'
+
+kubectl get pods -n namespace | grep Terminating | while read line; do 
+pod_name=$(echo $line | awk '{print $2}' ) name_space=$(echo $line | awk 
+'{print $1}' ); kubectl delete pods $pod_name -n $name_space --grace-period=0 --force; 
+done
+
+
+kubectl get pods --all-namespaces| grep Evicted |  $(awk '{print "kubectl -n " $1 " delete pod "$2}')
+
+MUST READ
+
+https://stackoverflow.com/questions/56486023/does-kubernetes-consider-the-current-memory-usage-when-scheduling-pods
+
+
+apiserver: main component exposing APIs for all the other master components
+scheduler: uses information in the pod spec to decide on which node to run a pod
+controller-manager: responsible for node management (detecting if a node fails), pod replication, and endpoint creation
+etcd: key/value store used for storing all internal cluster data
+Node components are worker machines in Kubernetes, managed by the master. Each node contains the necessary components to run pods:
+
+kubelet: handles all communication between the master and the node on which it is running. It interfaces with the container runtime to deploy and monitor containers
+kube-proxy: is in charge with maintaining network rules for the node. It also handles communication between pods, nodes, and the outside world.
+container runtime: runs containers on the node.
+
+
+kubectl get pods -o wide --sort-by=.spec.nodeName | grep -i Terminating
+
+k describe pod xxx-deployment-8dcd499c-7np24 | grep -i 'Last State' -A 4
+    Last State:     Terminated
+      Reason:       Error
+      Exit Code:    137
+      Started:      Tue, 11 Feb 2020 09:35:00 -0500
+      Finished:     Tue, 11 Feb 2020 09:36:14 -0500
+
+
+kubectl get po -o jsonpath='{range .items[*]}{.spec.containers[*].image}{"\n"}{end}'
+
+kubectl -n kube-system get po -o jsonpath='{range .items[*]} {.spec.containers[*].image}{"\n"}{end}'
+
+kubectl get pods --sort-by=.status.containerStatuses[*].restartCount
+kubectl get pods --sort-by=.status.phase
+
+kubectl get po coredns-6955765f44-nv6tw -n kube-system -o yaml | grep -i nodeName -B 10
+
+kubectl run --generator=run-pod/v1 --image=nginx nginx --dry-run -o yaml > 3.yaml
+kubectl -n kube-system get po coredns-6955765f44-nv6tw -o jsonpath='{.items[*].spec.containers[*].image}'
+kubectl expose deploy nginx --port 8073 --target-port 80 --type NodePort
+
+sudo iptables-save  | grep nginx
+
+kubectl run -it --image=busybox debug --restart=Never -- sh
+
+for item in client-cert client-key-data certificate-authority-data; 
+do 
+  echo $item; 
+  grep $item ~/.kube/config | awk '{print $2}' | base64 -d > $item.pem; 
+done
+
+cat > encryption-config.yaml <<EOF
+kind: EncryptionConfig
+apiVersion: v1
+resources:
+  - resources:
+      - secrets
+    providers:
+      - aescbc:
+          keys:
+            - name: key1
+              secret: ${ENCRYPTION_KEY}
+      - identity: {}
+EOF
+
+Aditya R Shttps://vocon-it.com/2019/08/08/cka-labs-11-kubernetes-services/
+10:37 PMAditya R Skubectl label node <nodename> <labelname>-
+11:23 PMAditya R Skubectl label nodes master vip=true --overwrite
+11:33 PMAditya R Skubectl taint node master node-role.kubernetes.io/master-
+11:34 PMAditya R Skubectl label nodes master vip-
+
+PODs can be specified to tolerate certain taints. 
+We have the following cases for tolerations: 
+operator=“Exists“ and no other parameter –> will tolerate any taint operator=“Exists“ and key=“myKey“ –> will tolerate any taint with the „myKey“ key 
+operator=“Equal“ and key=“myKey“ and value=“myValue“ –> will tolerate taints with the corresponding key and value operator=“Equal“ and key=“myKey“ and value=“myValue“ and effect=“NoSchedule“ –> will tolerate taints with the corresponding key, value, and 
+
+
+kubectl top pods --all-namespaces --containers
+
+03/24/2020
+
+================================================================
+ Troubleshooting Troubleshooting Troubleshooting Troubleshooting
+===============================================================
+The Kubeconfig environmental variable is probably not set.
+export KUBECONFIG=/etc/kubernetes/admin.conf or $HOME/.kube/config
+The user’s $HOME directory has no .kube/config file.
+If you don’t have a .kube or config file
+mkdir -p $HOME/.kube
+sudo cp -i /etc/kubernetes/admin.conf HOME/.kube/config sudo chown (id -u):$(id -g) $HOME/.kube/config
+Alternatively you can also export KUBECONFIG variable like this:
+export KUBECONFIG=$HOME/.kube/config
+The server/port configured in the config file above is wrong.
+Is it the same as the IP/hostname of the master server? if not did you copy it? You might
+want to fix that.
+By the way you can get the hostname by issueing the hostname command on your cli. or
+ifconfig for the ip. :slight_smile:
+Kubelet service may be down. This may be due to the fact that swap is enabled.
+sudo swapoff -a
+To make it permanent go to /etc/fstab
+sudo -i
+swapoff -a
+exit
+strace -eopenat kubectl version
+sudo systemctl restart kubelet.service
+Docker service may be down, hence the kubeapi pod isn’t running
+sudo systemctl start docker
+sudo systemctl start kubelet
+mkdir -p $HOME/.kube
+sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+sudo chown (id -u):(id -g) $HOME/.kube/config
+
+Firewalls may be blocking the access
+sudo systemctl status firewalld #redhat centos
+sudo systemctl stop firewalld #redhat, centos
+sudo ufw status verbose #ubuntu
+sudo ufw disable #ubuntu
+
+https://stackoverflow.com/questions/52720380/kubernetes-api-server-is-not-starting-on-a-single-kubeadm-cluster/52724543
+
+https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux_atomic_host/7/html/getting_started_with_kubernetes/troubleshooting_kubernetes
+
+To start using your cluster, you need to run the following as a regular user:
+  mkdir -p $HOME/.kube
+  sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+  sudo chown $(id -u):$(id -g) $HOME/.kube/config
+You should now deploy a pod network to the cluster.
+Run "kubectl apply -f [podnetwork].yaml" with one of the options listed at:
+  https://kubernetes.io/docs/concepts/cluster-administration/addons/
+Then you can join any number of worker nodes by running the following on each as root:
+kubeadm join 10.128.0.8:6443 --token ukmsa3.g9fuchfq0cd6oqvg \
+    --discovery-token-ca-cert-hash sha256:4d1c668cf309e8202fed5bddeb39dc021829aff1c4a9f48369f3d23dd4b7761d
+	
+	apt-mark unhold kubeadm && \
+apt-get update && apt-get install -y kubeadm=1.15.x-00 && \
+apt-mark hold kubeadm
+
+
+April 5th
+
+sudo apt-get update && sudo apt-get install -y apt-transport-https curl
+curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+cat <<EOF | sudo tee /etc/apt/sources.list.d/kubernetes.list
+deb https://apt.kubernetes.io/ kubernetes-xenial main
+EOF
+sudo apt-get update
+
+apt-cache show kubeadm |grep 1.17
+apt-get install kubeadm=1.17.4-00 kubectl=1.17.4-00 kubelet=1.17.4-00
+
+
+sudo kubeadm init --pod-network-cidr=10.244.0.0/16 Must pass pod-cidr cumpursorly
+
+
+ETCDCTL_API=3 etcdctl snapshot save /tmp/snapshot.db --cacert /etc/kubernetes/pki/etcd/ca.crt --cert /etc/kubernetes/pki/etcd/server.crt --key /etc/kubernetes/pki/etcd/server.key 
+
+Deleted a nginx (sample)pod to restore later
+
+ETCDCTL_API=3 etcdctl snapshot restore /tmp/etcd-backup.db --data-dir /var/lib/etcd-backup****
+
+mv kube-apiserver.yaml out of the manifests folder 
+
+Modified the hostpath inside etcd.yaml
+   - hostPath:
+      path: /var/lib/etcd-backup****
+      type: DirectoryOrCreate
+    name: etcd-data
+status: {}
+
+
+root@master:/var/lib/etcd/member/snap# kubeadm token list
+TOKEN                     TTL         EXPIRES                USAGES                   DESCRIPTION                                                EXTRA GROUPS
+ukmsa3.g9fuchfq0cd6oqvg   23h         2020-04-06T17:36:26Z   authentication,signing   The default bootstrap token generated by 'kubeadm init'.   system:bootstrappers:kubeadm:default-node-token
+root@master:/var/lib/etcd/member/snap# kubeadm token delete
+missing subcommand; 'token delete' is missing token of form "\\A([a-z0-9]{6})\\z"
+To see the stack trace of this error execute with --v=5 or higher
+root@master:/var/lib/etcd/member/snap# kubeadm token delete ukmsa3.g9fuchfq0cd6oqvg
+bootstrap token "ukmsa3" deleted
+root@master:/var/lib/etcd/member/snap# kubeadm token create --print-join-command
+W0405 18:36:46.496341   11793 validation.go:28] Cannot validate kube-proxy config - no validator is available
+W0405 18:36:46.496537   11793 validation.go:28] Cannot validate kubelet config - no validator is available
+kubeadm join 10.128.0.8:6443 --token gafipq.0t4rt47tecqoki0y     --discovery-token-ca-cert-hash sha256:4d1c668cf309e8202fed5bddeb39dc021829aff1c4a9f48369f3d23dd4b7761d 
+root@master:/var/lib/etcd/member/snap# kubeadm token list
+TOKEN                     TTL         EXPIRES                USAGES                   DESCRIPTION                                                EXTRA GROUPS
+gafipq.0t4rt47tecqoki0y   23h         2020-04-06T18:36:46Z   authentication,signing   <none>                                                     system:bootstrappers:kubeadm:default-node-token
+root@master:/var/lib/etcd/member/snap# 
+
+
+kubectl run nginx-deploy --image=nginx --dry-run -o yaml >nginx-deploy.yaml
+
+cordon only makes the node unschedulable but does not evict existing pods
+
+drain evicts the running pods which are created by controllers(ds,deploy,etc)
+
+kubectl drain node-name
+
+
+cat > /tmp/file.sh <<EOF
+> kubectl get pods --all-namespaces -o jsonpath="{.items[*].spec.containers[*].image}"
+> EOF
+
+
+
+$.car.wheels[0]
+
+input 
+[ 10,20,30,43,56,22,21 ]
+$[?( @ > 40)] 
+
+kubectl get pods -l name=web -o=jsonpath='{.items..metadata.name}'
+
+kubectl get deploy/nginx-deploy -o yaml>test.yaml
+
+kubectl get nodes -o=jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.status.nodeInfo.osImage}{"\n"}{end}'
+
+
+$ kubectl get service elasticsearch --output json
+{
+    "apiVersion": "v1",
+    "kind": "Service",
+    "metadata": {
+        ... stuff that really has nothing to do with my question ...
+    },
+    "spec": {
+        "clusterIP": "10.0.0.174",
+        "ports": [
+             {
+                "name": "http",
+                "nodePort": 31041,
+                "port": 9200,
+                "protocol": "TCP",
+                "targetPort": 9200
+            },
+            {
+                "name": "transport",
+                "nodePort": 31987,
+                "port": 9300,
+                "protocol": "TCP",
+                "targetPort": 9300
+            }
+        ],
+        "selector": {
+            "component": "elasticsearch"
+        },
+        "sessionAffinity": "None",
+        "type": "NodePort"
+    },
+    "status": {
+        "loadBalancer": {}
+    }
+}
+
+kubectl get service kubernetes --output jsonpath='{.spec.ports[?(@.name=="https")].targetPort}'
+
+kubectl get nodes -o=jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.status.images[*].names[1]}{"\n"}{end}'
+
+***********************************************************************************************************************************
+***********************************************************************************************************************************
+****************https://github.com/chaitushiva/dockerlabs/blob/master/kubernetes/cheatsheets/kubectl.md ********************************
+***********************************************************************************************************************************
+***********************************************************************************************************************************
+

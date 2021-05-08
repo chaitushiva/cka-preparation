@@ -1,0 +1,127 @@
+  750  ls
+  751  cd ..
+  752  ls
+  753  cd cbr0/
+  754  ls
+  755  cd ~
+  756  ;s
+  757  ls
+  758  cd install/
+  759  ls
+  760  cd ..
+  761  kubectl get deploy
+  762  kubectl run nginx --generator=run-pod/v1 --image=nginx --restart=OnFailure
+  763  kubectl run nginx --generator=run-pod/v1 --image=nginx --restart=Never
+  764  kubectl run nginx1 --generator=run-pod/v1 --image=nginx --restart=Never
+  765  kubectl run nginx1 --generator=run-pod/v1 --image=nginx --restart=Always
+  766  kubectl run nginx2 --generator=run-pod/v1 --image=nginx --restart=Always
+  767  kubectl run nginx2 --generator=run-deploy/v1 --image=nginx --restart=Always
+  768  kubectl run nginx2 --generator=run-deployment/v1 --image=nginx --restart=Always
+  769  kubectl run nginx2 --image=nginx --restart=Always
+  770  kubectl get nodesw
+  771  kubectl get nodes
+  772  kubectl run nginx2 --image=nginx 
+  773  kubectl run nginx2 --image=nginx --dry-run -o yaml > nginx.yaml 
+  774  vi nginx.yaml 
+  775  echo nginx.yaml | kubectl apply -f -
+  776  echo nginx.yaml | kubectl apply -f 
+  777  echo nginx.yaml | kubectl create -f 
+  778  kubectl apply -f nginx.yaml 
+  779  kubectl get depl
+  780  kubectl get deploy 
+  781  kubectl get pods 
+  782  kubectl get pods --help
+  783  kubectl get pods -o=jsonpath='{.metadata.name}'
+  784  kubectl get pods -o=jsonpath='{range .items[*]}{.metadata.name}'
+  785  kubectl get pods -o=jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}'
+  786  kubectl get pods -o=jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.metadata.image.name}{"\n"}{end}'
+  787  kubectl get pods -o json
+  788  kubectl get pods -o=jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.spec.containers.image}{"\n"}{end}'
+  789  kubectl get pods -o=jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.spec.containers[*].image}{"\n"}{end}'
+  790  kubectl get pods -o=jsonpath='{range .items[*]}{.metadata.name}{"\t"}{"image:"}{.spec.containers[*].image}{"\n"}{end}'
+  791  kubectl get pods | grep Running
+  792  kubectl get pods | grep Running | while read line; do echo pod_name=$(echo awk '{print 1}'); done
+  793  kubectl get pods | grep Running | while read line; do echo pod_name=$(echo awk {print 1}); done
+  794  kubectl get pods | grep Running | while read line; do echo pod_name=$(echo $(awk {print 1})); done
+  795  clear
+  796  kubectl get pods --sort-by
+  797  kubectl get pods --sort-by --help
+  798  kubectl get pods --help | grep sort
+  799  kubectl get pods -o json
+  800  kubectl get pods --sort-by=.status.phase
+  801  kubectl get pods 
+  802  kubectl get pods --sort-by=.
+  803  kubectl get pods --sort-by=.status.qosClass
+  804  kubectl get pods --sort-by=.status.nodeName
+  805  kubectl get pods --sort-by=.spec.nodeName
+  806  kubectl get pods --sort-by=.spec.nodeName -o wide
+  807  vi nginx.yaml 
+  808  kubectl get nodes
+  809  kubectl get nodes --show-lables
+  810  kubectl get nodes --show-labels
+  
+ 
+Custom-scheduler
+ 
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    component: kube-scheduler
+    tier: control-plane
+  name: my-scheduler
+  namespace: kube-system
+spec:
+  containers:
+  - command:
+    - kube-scheduler
+    - --authentication-kubeconfig=/etc/kubernetes/scheduler.conf
+    - --authorization-kubeconfig=/etc/kubernetes/scheduler.conf
+    - --bind-address=127.0.0.1
+    - --secure-port=7777
+    - --port=7778
+    - --kubeconfig=/etc/kubernetes/scheduler.conf
+    - --leader-elect=false
+    - --scheduler-name=my-scheduler
+    image: k8s.gcr.io/kube-scheduler:v1.17.4
+    imagePullPolicy: IfNotPresent
+    livenessProbe:
+      failureThreshold: 8
+      httpGet:
+        host: 127.0.0.1
+        path: /healthz
+        port: 7777
+        scheme: HTTPS
+      initialDelaySeconds: 15
+      timeoutSeconds: 15
+    name: my-scheduler
+    resources:
+      requests:
+        cpu: 100m
+    volumeMounts:
+    - mountPath: /etc/kubernetes/scheduler.conf
+      name: kubeconfig
+      readOnly: true
+  hostNetwork: true
+  priorityClassName: system-cluster-critical
+  volumes:
+  - hostPath:
+      path: /etc/kubernetes/scheduler.conf
+      type: FileOrCreate
+    name: kubeconfig
+status: {}
+~                                
+
+
+cp kube-scheduler my-scheduler
+vi my-scheduler
+add below arguments to command
+- --port=7778
+- --secure-port=7777
+- --scheduler-name=myscheduler
+
+and name change
+and healthcheck port to 7777
+
+
