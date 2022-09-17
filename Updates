@@ -1,0 +1,24 @@
+To view the actual kubelet config on your node, you can use the Kubernetes API to confirm that your configuration has applied.
+
+$ kubectl proxy
+$ curl -sSL "http://localhost:8001/api/v1/nodes/ip-192-168-92-220.us-east-2.compute.internal/proxy/configz" | jq
+
+{
+  "kubeletconfig": {
+    ...
+    "registryPullQPS": 20,
+    "registryBurst": 40,
+    ...
+  }
+}
+https://docs.aws.amazon.com/AmazonECS/latest/userguide/firelens-taskdef.html log configuration ecs ec2
+
+Profile updates:
+Summary needs to include image build process too
+Update CKA cert on top of the resume with logo
+Put golang in top projects
+
+Update AMI build process for eks ami using packer refer to this for prep https://wangpp.medium.com/packer-packing-custom-amis-amazon-linux-2-for-eks-fe0aed3c0960
+https://github.com/aws-samples/amazon-eks-custom-amis
+https://github.com/awslabs/amazon-eks-ami
+
