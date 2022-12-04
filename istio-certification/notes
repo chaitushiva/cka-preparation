@@ -5,3 +5,30 @@ Downstream: A downstream host connects to Envoy, sends requests, and receives re
 Upstream: An upstream host receives connections and requests from Envoy and returns responses.
 
 Listener: A listener is a named network location (e.g., port, unix domain socket, etc.) that can be connected to by downstream clients. Envoy exposes one or more listeners that downstream hosts connect to.
+
+request inside ingress gateway pod to a service and we can see the request 
+istio-proxy@istio-ingressgateway-68bb48d74b-gxf4f:/$ curl -LI http://fleetman-webapp.default.svc.cluster.local:80/
+HTTP/1.1 200 OK
+server: istio-envoy
+date: Sun, 04 Dec 2022 04:24:20 GMT
+content-type: text/html
+content-length: 883
+last-modified: Sun, 27 Oct 2019 18:05:16 GMT
+etag: "5db5dc5c-373"
+expires: Sun, 04 Dec 2022 04:24:20 GMT
+cache-control: max-age=0,public,no-store,no-cache
+accept-ranges: bytes
+x-envoy-upstream-service-time: 0
+x-envoy-decorator-operation: fleetman-webapp.default.svc.cluster.local:80/*
+
+
+**************https://support.f5.com/csp/article/K34977262?utm_source=f5support&utm_medium=RSS********************
+[2022-12-04T04:43:16.924Z] "HEAD /experimental HTTP/1.1" 200 - via_upstream - "-" 0 0 1 0 "-" "curl/7.81.0 │
+│ " "e8f2663e-5714-905d-981d-b0e583610d85" "fleetman-webapp.default.svc.cluster.local" "10.244.1.190:80" inb │
+│ ound|80|| 127.0.0.6:55863 10.244.1.190:80 10.244.2.56:33776 - default  
+│
+│ [2022-12-04T04:44:26.320Z] "GET /experimental HTTP/1.1" 200 - via_upstream - "-" 0 883 1 0 "10.244.1.0" "M │
+│ ozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Saf │
+│ ari/537.36" "faa84d94-b6e0-9fca-a0b0-604487cd89f2" "192.168.254.143:31471" "10.244.1.190:80" inbound|80||  │
+│ 127.0.0.6:55743 10.244.1.190:80 10.244.1.0:0 outbound_.80_.experimental_.fleetman-webapp.default.svc.clust │
+│ er.local default
