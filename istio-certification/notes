@@ -34,3 +34,5 @@ x-envoy-decorator-operation: fleetman-webapp.default.svc.cluster.local:80/*
 │ er.local default
 
 https://blog.getambassador.io/understanding-envoy-proxy-and-ambassador-http-access-logs-fee7802a2ec5
+
+/Users/shivac.konduru/Downloads/_course_files/2 Traffic Solution - Ending Files/7-istio-rules-stickiness-demo.yaml we have to come back
