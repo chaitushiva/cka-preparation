@@ -32,3 +32,5 @@ x-envoy-decorator-operation: fleetman-webapp.default.svc.cluster.local:80/*
 │ ari/537.36" "faa84d94-b6e0-9fca-a0b0-604487cd89f2" "192.168.254.143:31471" "10.244.1.190:80" inbound|80||  │
 │ 127.0.0.6:55743 10.244.1.190:80 10.244.1.0:0 outbound_.80_.experimental_.fleetman-webapp.default.svc.clust │
 │ er.local default
+
+https://blog.getambassador.io/understanding-envoy-proxy-and-ambassador-http-access-logs-fee7802a2ec5
