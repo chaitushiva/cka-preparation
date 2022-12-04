@@ -1,2 +1,7 @@
 Traffic management
 
+Downstream: A downstream host connects to Envoy, sends requests, and receives responses.
+
+Upstream: An upstream host receives connections and requests from Envoy and returns responses.
+
+Listener: A listener is a named network location (e.g., port, unix domain socket, etc.) that can be connected to by downstream clients. Envoy exposes one or more listeners that downstream hosts connect to.
