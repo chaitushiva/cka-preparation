@@ -1,0 +1,16 @@
+apparmor pod level annotation
+
+template:
+    metadata:
+      annotations:
+        container.apparmor.security.beta.kubernetes.io/{############CONTAINER_NAME##############}: localhost/docker-default
+      creationTimestamp: null
+      labels:
+        app: spacecow
+    spec:
+      containers:
+      - image: httpd:2.4.52-alpine
+        imagePullPolicy: IfNotPresent
+
+apparmor_parser runs the profile
+apparmor_status checks the status
