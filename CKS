@@ -14,3 +14,5 @@ template:
 
 apparmor_parser runs the profile
 apparmor_status checks the status
+
+As to the topics: you WON'T get PSP's,OPA/gatekeeper/cluster upgrade/kubernetes dashboard. You will FOR SURE get: RBAC (be quick with this), Falco (you should be able to dream this), Networkpolicies, ETCD/KUBE-API static pod config, Dockerfile/YAML manual code review, enabling/configuring audit logging, enabling/configuring imagepolicywebhook, trivy image scans, fixing kube-bench issues, extracting data from secrets (NOT from the ETCD with etcdctl directly), verifying platform binaries, enabling apparmor profile/using it in a pod, creating runtimeclass/using it in a pod, immutability (securitycontext: readonlyfilesystem) in a pod
