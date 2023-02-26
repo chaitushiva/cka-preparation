@@ -23,3 +23,28 @@ https://www.reddit.com/r/kubernetes/comments/10zy8uj/just_passed_my_cks_exam/
 
 Find the process listening on port 1234
 lsof -i :1234
+=================
+There is an unwanted process running which listens on port 1234 .
+
+Kill the process and delete the binary.
+
+
+Solution
+
+Find process
+
+# using netstat
+apt install net-tools
+netstat -tulpan | grep 1234
+
+# using lsof
+lsof -i :1234
+Find pull path
+
+ls -l /proc/17773/exe # use your ID instead
+Kill and delete
+
+kill 17773 # use your ID instead
+rm /usr/bin/app1
+
+============
