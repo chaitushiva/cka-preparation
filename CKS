@@ -20,3 +20,6 @@ As to the topics: you WON'T get PSP's,OPA/gatekeeper/cluster upgrade/kubernetes 
 
 Use code "KODEKLOUD20" for 20% off.
 https://www.reddit.com/r/kubernetes/comments/10zy8uj/just_passed_my_cks_exam/
+
+Find the process listening on port 1234
+lsof -i :1234
