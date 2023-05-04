@@ -37,3 +37,46 @@ spec:
               protocol: TCP
             - name: http
               containerPort: 
+####
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "thanos.fullname" . }}-store
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ include "thanos.name" . }}-store
+    chart: {{ include "thanos.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.store.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ include "thanos.name" . }}-store
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "thanos.name" . }}-store
+        release: {{ .Release.Name }}
+    spec:
+      containers:
+        - name: {{ include "thanos.name" . }}-store
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args:
+            - store
+            - --tsdb.path=/data/
+            - --objstore.config=type=s3,bucket={{ .Values.objStoreConfig.bucket }},region={{ .Values.objStoreConfig.region }},access_key={{ .Values.objStoreConfig.accessKey }},secret_key={{ .Values.objStoreConfig.secretKey }},endpoint={{ .Values.objStoreConfig.endpoint }}
+            - --grpc-address=0.0.0.0:10901
+          ports:
+            - containerPort: 10901
+              name: grpc
+          volumeMounts:
+            - name: data
+              mountPath: /data
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: {{ include "thanos.fullname" . }}-store-pvc
+
