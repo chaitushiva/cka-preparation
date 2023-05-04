@@ -1,0 +1,25 @@
+objectStorageConfig:
+  type: S3
+  config:
+    bucket: my-prom-bucket
+    endpoint: s3.us-west-2.amazonaws.com
+    access_key: my-access-key
+    secret_key: my-secret-key
+  # You can also add additional S3 configuration here, such as region and SSL settings
+
+query:
+  replicas: 2
+  # Add any additional query configuration here, such as tolerations or nodeSelector
+
+mimir:
+  replicas: 2
+  # Add any additional mimir configuration here, such as tolerations or nodeSelector
+
+store:
+  type: S3
+  config:
+    bucket: my-prom-bucket
+    endpoint: s3.us-west-2.amazonaws.com
+    access_key: my-access-key
+    secret_key: my-secret-key
+  # You can also add additional S3 configuration here, such as region and SSL settings
