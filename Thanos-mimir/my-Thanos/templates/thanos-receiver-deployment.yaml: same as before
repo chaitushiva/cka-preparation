@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "my-thanos.fullname" . }}-receiver
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: receiver
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/version: "0.20.0"
+    app.kubernetes.io/component: thanos
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: receiver
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: receiver
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/version: "0.20.0"
+        app.kubernetes.io/component: thanos
+    spec:
+      containers:
+        - name: receiver
+          image: quay.io/thanos/thanos:v0.20.0
+          args:
+            - "receive"
+            - "--tsdb.path=/data"
+            - "--grpc-address=0.0.0.0:10901"
+            - "--http-address=0.0.0.0:10902"
+            - "--receive.replication-factor=1"
+            - "--objstore.config=$(OBJSTORE_CONFIG)"
+          ports:
+            - name: grpc
+              containerPort: 10901
+              protocol: TCP
+            - name: http
+              containerPort: 10902
+              protocol: TCP
+          volumeMounts:
+            - name: data
+              mountPath: /data
+            - name: config
+              mountPath: /etc/thanos
+              readOnly: true
+      volumes:
+        - name: data
+          emptyDir: {}
+        - name: config
