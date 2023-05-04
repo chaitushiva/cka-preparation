@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "my-thanos.fullname" . }}-store
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: store
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/version: "0.20.0"
+    app.kubernetes.io/component: thanos
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: store
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: store
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/version: "0.20.0"
+        app.kubernetes.io/component: thanos
+    spec:
+      containers:
+        - name: store
+          image: quay.io/thanos/thanos:v0.20.0
+          args:
+            - "store"
+            - "--tsdb.path=/data"
+            - "--grpc-address=0.0.0.0:10901"
+            - "--http-address=0.0.0.0:10902"
+            - "--objstore.config=$(OBJSTORE_CONFIG)"
+          ports:
+            - name: grpc
+              containerPort: 10901
+              protocol: TCP
+            - name: http
+              containerPort: 
