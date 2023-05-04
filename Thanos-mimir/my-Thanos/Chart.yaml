@@ -1,0 +1,9 @@
+apiVersion: v2
+name: my-thanos
+description: A Helm chart for deploying Thanos Mimir and Thanos Query for monitoring two EKS clusters
+version: 0.1.0
+appVersion: 1.0.0
+dependencies:
+  - name: thanos
+    version: 0.20.0
+    repository: https://thanos.io/helm-chart/
