@@ -1,4 +1,60 @@
 
+import unittest
+from your_module import VaultAnnotationsGenerator
+
+class TestVaultAnnotationsGenerator(unittest.TestCase):
+    def setUp(self):
+        items = {
+            's3_general': True,
+            'kafka_enabled': False,
+            'redis_enabled': True
+        }
+        static_annotations = {
+            'vault.hashicorp.com/agent-inject': 'true',
+            'vault.hashicorp.com/namespace': '<<namespace_placeholder>>',
+            'vault.hashicorp.com/role': '<<cluster_placeholder>>-<<namespace_placeholder>>-risk-app'
+        }
+        self.generator = VaultAnnotationsGenerator(items, static_annotations)
+
+    def test_init(self):
+        self.assertEqual(self.generator.items, {
+            's3_general': True,
+            'kafka_enabled': False,
+            'redis_enabled': True
+        })
+        self.assertEqual(self.generator.annotations, {
+            'vault.hashicorp.com/agent-inject': 'true',
+            'vault.hashicorp.com/namespace': '<<namespace_placeholder>>',
+            'vault.hashicorp.com/role': '<<cluster_placeholder>>-<<namespace_placeholder>>-risk-app'
+        })
+        self.assertEqual(self.generator.value_prefix, 'xxxxx')
+        self.assertEqual(self.generator.s3_buckets, ['a', 'b'])
+
+    def test_generate_annotations(self):
+        self.generator.generate_annotations()
+
+        # Check if the S3 secrets annotations are generated correctly
+        self.assertEqual(self.generator.annotations['vault.hashicorp.com/agent-sec-s3-access'], 'xxxxx-access')
+        self.assertEqual(self.generator.annotations['vault.hashicorp.com/agent-temp-s3-access'], '{{{- with secret "vault.hashicorp.com/agent-temp-s3-access - }}} {{ - range $n,$s := .Data.data -}}{{- $s -}}{{- end -}}{{- end -}}')
+        self.assertEqual(self.generator.annotations['vault.hashicorp.com/agent-sec-s3-secret'], 'xxxxx-secret')
+        self.assertEqual(self.generator.annotations['vault.hashicorp.com/agent-temp-s3-secret'], '{{{- with secret "vault.hashicorp.com/agent-temp-s3-secret - }}} {{ - range $n,$s := .Data.data -}}{{- $s -}}{{- end -}}{{- end -}}')
+
+        # Check if the Redis secrets annotations are generated correctly
+        self.assertEqual(self.generator.annotations['vault.hashicorp.com/agent-sec-redis-access'], 'xxxxx-access')
+        self.assertEqual(self.generator.annotations['vault.hashicorp.com/agent-temp-redis-access'], '{{{- with secret "vault.hashicorp.com/agent-temp-redis-access - }}} {{ - range $n,$s := .Data.data -}}{{- $s -}}{{- end -}}{{- end -}}')
+        self.assertEqual(self.generator.annotations['vault.hashicorp.com/agent-sec-redis-secret'], 'xxxxx-secret')
+        self.assertEqual(self.generator.annotations['vault.hashicorp.com/agent-temp-redis-secret'], '{{{- with secret "vault.hashicorp.com/agent-temp-redis-secret - }}} {{ - range $n,$s := .Data.data -}}{{- $s -}}{{- end -}}{{- end -}}')
+
+    def test_create_annotation(self):
+        self.generator.create_annotation('s3-access', 'secret/data/myapp/s3-access')
+
+        # Check if the secret and template annotations are created correctly
+        self.assertEqual(self.generator.annotations['vault.hashicorp.com/agent-sec-s3-access'], 'secret/data/myapp/s3-access')
+        self.assertEqual(self.generator.annotations['vault.hashicorp.com/agent-temp-s3-access'], '{{{- with secret "vault.hashic
+
+
+
+
 class VaultAnnotationsGenerator:
     def __init__(self, static_annotations=None):
         """
