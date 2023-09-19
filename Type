@@ -1,0 +1,44 @@
+import boto3
+
+def generate_html_content(list1, list2):
+    # Construct HTML content with the provided lists
+    html_content = f"""
+    <html>
+    <body>
+        <h2>List 1</h2>
+        <ul>
+            {"".join(f"<li>{item}</li>" for item in list1)}
+        </ul>
+        <h2>List 2</h2>
+        <ul>
+            {"".join(f"<li>{item}</li>" for item in list2)}
+        </ul>
+    </body>
+    </html>
+    """
+    return html_content
+
+def send_html_email():
+    # Initialize the SNS client
+    client = boto3.client('sns', region_name='YOUR_AWS_REGION')
+
+    # Example lists
+    list1 = ['Item 1A', 'Item 1B', 'Item 1C']
+    list2 = ['Item 2A', 'Item 2B', 'Item 2C']
+
+    # Generate the HTML content with the provided lists
+    html_content = generate_html_content(list1, list2)
+
+    # Publish the HTML message
+    response = client.publish(
+        TopicArn='YOUR_SNS_TOPIC_ARN',
+        Message=html_content,
+        Subject='Your HTML Email Subject',
+        MessageStructure='html'
+    )
+
+    # Print the response
+    print('Message published. MessageId:', response['MessageId'])
+
+# Call the function to send the email
+send_html_email()
