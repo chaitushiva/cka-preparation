@@ -18,3 +18,16 @@ nsenter -t your-container-pid -n ip addr
 Be sure to use your own PID, and replace ip addr with the command you’d like to run inside the pod’s network namespace.
 
 Note: One advantage of using nsenter to run commands in a pod’s namespace – versus using something like docker exec – is that you have access to all of the commands available on the node, instead of the typically limited set of commands installed in containers.
+3)
+
+we check whether the file /tmp/healthy exists, and if the command returns an exit code zero, the container will be marked as healthy; otherwise, it will be marked as unhealthy.
+readinessProbe:
+  initialDelaySeconds: 1
+  periodSeconds: 5
+  timeoutSeconds: 1
+  successThreshold: 1
+  failureThreshold: 1
+  exec:
+    command:
+      - cat
+      - /tmp/healthy
