@@ -1,1 +1,20 @@
-https://github.com/kubernetes/kubernetes/issues/96858
+1) https://github.com/kubernetes/kubernetes/issues/96858
+2) https://www.digitalocean.com/community/tutorials/how-to-inspect-kubernetes-networking
+The second is a pause container running in the hello-world pod. This container exists solely to hold onto the pod’s network namespace
+docker ps
+Output
+CONTAINER ID        IMAGE                                   COMMAND                  CREATED             STATUS              PORTS               NAMES
+173ee46a3926        gcr.io/google-samples/node-hello        "/bin/sh -c 'node se…"   9 days ago          Up 9 days                               k8s_hello-world_hello-world-5b446dd74b-pxtzt_default_386a9073-7e35-11e8-8a3d-bae97d2c1afd_0
+11ad51cb72df        k8s.gcr.io/pause-amd64:3.1              "/pause"                 9 days ago          Up 9 days                               k8s_POD_hello-world-5b446dd74b-pxtzt_default_386a9073-7e35-11e8-8a3d-bae97d2c1afd_0
+
+To get the process ID of either container, take note of the container ID or name, and use it in the following docker command:
+
+docker inspect --format '{{ .State.Pid }}' container-id-or-name
+Output
+14552
+A process ID (or PID) will be output. Now we can use the nsenter program to run a command in that process’s network namespace:
+
+nsenter -t your-container-pid -n ip addr
+Be sure to use your own PID, and replace ip addr with the command you’d like to run inside the pod’s network namespace.
+
+Note: One advantage of using nsenter to run commands in a pod’s namespace – versus using something like docker exec – is that you have access to all of the commands available on the node, instead of the typically limited set of commands installed in containers.
