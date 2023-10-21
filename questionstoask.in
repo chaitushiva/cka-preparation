@@ -31,3 +31,10 @@ readinessProbe:
     command:
       - cat
       - /tmp/healthy
+4)
+Startup probes: Verify whether an application within a container has started. It is executed only at startup. If a container fails this probe, the container is killed and follows the restartPolicy for the pod. You can configure startup probes in the spec.containers.startupProbe attribute. A significant reason to include startup probes is because some legacy applications require additional startup time when first initialized, which can make it difficult to set liveness probe parameters. Make sure you use the same protocol as the application when you configure a startupProbe— and ensure the failureThreshold * periodSeconds is long enough to cover the worst case startup time. 
+
+Readiness probes: Verify that a Docker container is ready to serve requests. If the probe returns a failed state, Kubernetes removes the IP address for the pod from the endpoints of all services. Readiness probes enable you to advise Kubernetes that a running container should not receive traffic until additional tasks are completed. Those tasks include loading files, warming caches, and establishing network connections. The location to configure readiness probes is in the spec.containers.readinessProbe attribute for the pod configuration. These probes must be run periodically, with that period defined by the periodSeconds attribute.
+
+Liveness probes: Use these liveness checks to assess whether an application running in a container is in a healthy state. If the liveness probe fails, Kubernetes kills the container and attempts to restart it. Liveness probes are useful when you want to ensure your application is not experiencing deadlock or silently unresponsive. Deadlock is a situation when your container is not ready but the liveness probe is performing and it exceeds the failure threshold, because of a too short delay time. To mitigate this, you should use a startup probe and set your threshold high enough. Configure liveness probes in the spec.containers.livenessProbe code attribute of the pod configuration. Similar to readiness probes, liveness probes also run periodically.
+
