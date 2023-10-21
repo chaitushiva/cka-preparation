@@ -40,7 +40,7 @@ Liveness probes: Use these liveness checks to assess whether an application runn
 
 5) https://kubesandclouds.com/2021-01-20-ksniff/
 
-6) Karpenter binds the pod to new node that it provisioned. Karpenter eliminates the need to manage many different node groups. You can deploy n number of provisioners like below based on your needs
+6) Karpenter binds the pod to new node that it provisioned. Karpenter eliminates the need to manage many different node groups. You can deploy n number of provisioners like below based on your needs https://kubesandclouds.com/2022-01-04-karpenter/
 apiVersion: karpenter.sh/v1alpha5
 kind: Provisioner
 metadata:
