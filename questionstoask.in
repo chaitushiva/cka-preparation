@@ -38,3 +38,6 @@ Readiness probes: Verify that a Docker container is ready to serve requests. If 
 
 Liveness probes: Use these liveness checks to assess whether an application running in a container is in a healthy state. If the liveness probe fails, Kubernetes kills the container and attempts to restart it. Liveness probes are useful when you want to ensure your application is not experiencing deadlock or silently unresponsive. Deadlock is a situation when your container is not ready but the liveness probe is performing and it exceeds the failure threshold, because of a too short delay time. To mitigate this, you should use a startup probe and set your threshold high enough. Configure liveness probes in the spec.containers.livenessProbe code attribute of the pod configuration. Similar to readiness probes, liveness probes also run periodically.
 
+5) https://kubesandclouds.com/2021-01-20-ksniff/
+
+
