@@ -218,6 +218,87 @@ class GitHubRepoCreator:
             print(f"Error creating release branch: {e}")
             return False
 
+import git
+import os
+import re
+
+class GitHubRepoCreator:
+    def __init__(self, access_token, repo_name, org, feature_branch):
+        self.access_token = access_token
+        self.repo_name = repo_name
+        self.org = org
+        self.feature_branch = feature_branch
+
+    def create_repository(self, private=False):
+        org = self.org if self.org else self.get_user()
+        # Replace 'your-username' with the actual GitHub username
+        repo = org.create_repo(self.repo_name, private=private)
+        return repo
+
+    def create_branches(self, repo):
+        master_sha = repo.branches['master'].commit.hexsha
+        for branch_name in ['develop', self.feature_branch]:
+            ref = repo.create_head(branch_name, commit=master_sha)
+            ref.checkout()
+
+    def rename_master_to_develop(self, repo_path):
+        try:
+            repo = git.Repo(repo_path)
+            # Make sure we are on the 'master' branch
+            repo.heads['master'].checkout()
+            # Rename the branch to 'develop'
+            repo.git.branch('-m', 'develop')
+            # Push the new 'develop' branch
+            repo.remotes.origin.push('develop')
+            return True
+        except Exception as e:
+            print(f"Error renaming branch: {e}")
+            return False
+
+    def create_feature_branch(self, repo_path):
+        try:
+            repo = git.Repo(repo_path)
+            # Make sure we are on the 'develop' branch
+            repo.heads['develop'].checkout()
+            # Create a new feature branch
+            repo.heads[self.feature_branch] = repo.create_head(self.feature_branch)
+            repo.heads[self.feature_branch].checkout()
+            # Push the new feature branch
+            repo.remotes.origin.push(self.feature_branch)
+            return True
+        except Exception as e:
+            print(f"Error creating feature branch: {e}")
+            return False
+
+    def create_release_branch(self, repo_path):
+        try:
+            repo = git.Repo(repo_path)
+            # Make sure we are on the 'develop' branch
+            repo.heads['develop'].checkout()
+
+            # Find the latest release branch matching the pattern
+            branch_pattern = r'release/\d+\.\d+\.\d+'
+            release_branches = [b for b in repo.branches if re.match(branch_pattern, b.name)]
+            if release_branches:
+                # Determine the next release branch number
+                latest_branch = max(release_branches, key=lambda b: int(b.name.split("/")[-1]))
+                next_number = int(latest_branch.name.split("/")[-1]) + 1
+            else:
+                # If no existing release branches, start from 0
+                next_number = 0
+
+            new_branch_name = f'release/{next_number}.0.0'
+
+            # Create the new release branch
+            repo.heads[new_branch_name] = repo.create_head(new_branch_name)
+            repo.heads[new_branch_name].checkout()
+            # Push the new release branch
+            repo.remotes.origin.push(new_branch_name)
+            return True
+        except Exception as e:
+            print(f"Error creating release branch: {e}")
+            return False
+
 
 
 
