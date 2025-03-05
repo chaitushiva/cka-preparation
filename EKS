@@ -1,0 +1,93 @@
+To allow traffic to and from these CIDRs using the Amazon VPC CNI (Custom Networking), follow these steps:
+
+1. Enable Custom Networking in Amazon VPC CNI
+Amazon VPC CNI allows you to use secondary CIDR blocks in the VPC for pod networking. You need to ensure that:
+
+Your VPC has a secondary CIDR (100.x.x.x) allocated.
+Your worker nodes have ENIConfig configured to use this secondary CIDR.
+If not already enabled, install and configure the Amazon VPC CNI plugin with custom networking:
+
+kubectl set env daemonset aws-node -n kube-system \
+    AWS_VPC_K8S_CNI_CUSTOM_NETWORK_CFG=true
+2. Configure Subnets and Route Tables
+Ensure your VPC route tables allow traffic between the 100.x.x.x and 10.x.x.x CIDRs.
+If using private subnets, update NAT Gateway routes to handle return traffic.
+Example routes to check:
+100.x.x.x/16 → local (should already exist)
+10.x.x.x/24 → local (should already exist)
+Check with:
+
+aws ec2 describe-route-tables --filters Name=vpc-id,Values=<VPC_ID>
+3. Configure Security Groups
+Your EKS worker nodes and other AWS resources in 10.x.x.x must allow traffic from 100.x.x.x:
+
+Modify the worker node security group:
+aws ec2 authorize-security-group-ingress \
+    --group-id <SG_ID> \
+    --protocol all \
+    --cidr 100.x.x.x/16
+Modify the pod security group (if using Security Groups for Pods):
+aws ec2 authorize-security-group-ingress \
+    --group-id <POD_SG_ID> \
+    --protocol all \
+    --cidr 10.x.x.x/24
+4. Verify IP Address Assignment
+Ensure that the pods are assigned 100.x.x.x IPs by checking:
+
+kubectl get pods -o wide
+If some pods are still using 10.x.x.x, ensure they are scheduled on nodes configured with custom CNI.
+
+5. Test Connectivity
+To verify, run a connectivity test between a pod (100.x.x.x) and an instance (10.x.x.x):
+
+kubectl exec -it <pod-name> -- curl http://10.x.x.x
+or
+
+ping 100.x.x.x -c 4  # From an instance in 10.x.x.x
+Conclusion
+By enabling Amazon VPC CNI custom networking, ensuring correct route tables and security groups, and testing connectivity, you can allow seamless traffic flow between 100.x.x.x and 10.x.x.x CIDRs in your EKS cluster.
+
+
+
+Traffic Flow (Hops) Between 100.x.x.x (Pods) and 10.x.x.x (Nodes/Resources) in EKS with Custom CNI
+Scenario:
+
+Source: Pod in the 100.x.x.x CIDR (assigned via Amazon VPC CNI Custom Networking).
+Destination: Node or AWS resource in the 10.x.x.x CIDR (VPC primary subnet).
+Hop-by-Hop Traffic Flow (Request & Response)
+Request Flow (100.x.x.x → 10.x.x.x)
+
+1️⃣ Pod in 100.x.x.x sends a packet
+
+The pod has an IP from the 100.x.x.x range (secondary CIDR of the VPC).
+It tries to reach a resource in 10.x.x.x (e.g., another pod, a node, or a service).
+2️⃣ Packet goes through the Pod’s ENI (Elastic Network Interface)
+
+The Amazon VPC CNI attaches secondary ENIs to the node for custom networking.
+The pod’s ENI forwards the packet to the worker node.
+3️⃣ Node's Primary ENI Routes the Packet (Based on Routing Table)
+
+The worker node receives the packet and routes it through the VPC route table.
+The route table has a local route for both 100.x.x.x and 10.x.x.x, so no NAT is needed.
+4️⃣ Packet reaches the destination (10.x.x.x)
+
+If the target is another pod, it follows the same Amazon CNI rules.
+If the target is an EC2 instance or AWS service (RDS, ALB, etc.), it reaches directly via VPC networking.
+Response Flow (10.x.x.x → 100.x.x.x)
+
+5️⃣ Response is sent from 10.x.x.x back to 100.x.x.x
+
+The EC2 instance or AWS service sends the response to 100.x.x.x.
+6️⃣ Security Group & Network ACL Check
+
+Ensure the security groups and network ACLs allow communication from 10.x.x.x to 100.x.x.x.
+7️⃣ Route Table Lookup
+
+The VPC route table finds the local route for 100.x.x.x and directs it back to the EKS node.
+8️⃣ Node forwards the packet via Pod ENI
+
+The worker node sends the response to the pod via its secondary ENI (custom CNI).
+9️⃣ Pod in 100.x.x.x receives the response
+
+The traffic completes successfully.
+
