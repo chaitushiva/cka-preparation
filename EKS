@@ -91,3 +91,61 @@ The worker node sends the response to the pod via its secondary ENI (custom CNI)
 
 The traffic completes successfully.
 
+
+📌 Key Components:
+1️⃣ Amazon EKS Cluster
+
+Worker Nodes (10.x.x.x CIDR) in the primary VPC subnet.
+Pods (100.x.x.x CIDR) assigned using Custom Amazon VPC CNI.
+Secondary ENIs allow pods to get IPs from 100.x.x.x.
+2️⃣ Amazon VPC (Primary & Secondary CIDRs)
+
+Primary CIDR (10.x.x.x): Used for nodes, ALB, RDS, and AWS services.
+Secondary CIDR (100.x.x.x): Allocated for pod networking via Amazon VPC CNI.
+3️⃣ ENI (Elastic Network Interface) & Routing
+
+Each node has Primary ENI (10.x.x.x) and Secondary ENIs (100.x.x.x) for pods.
+VPC Route Table ensures local traffic routing between 100.x.x.x and 10.x.x.x.
+4️⃣ Security Groups & Network ACLs
+
+Worker nodes allow inbound/outbound traffic between 100.x.x.x ↔ 10.x.x.x.
+Pods use Security Groups for Pods (SGP) to control communication.
+📌 Architecture Diagram:
+                      ┌──────────────────────────────┐
+                      │       Amazon VPC             │
+                      │  CIDR: 10.x.x.x / 100.x.x.x  │
+                      ├──────────────────────────────┤
+                      │                              │
+    ┌────────────────▼────────────────┐  ┌──────────────────────┐
+    │       EKS Worker Node            │  │      AWS Services   │
+    │       (10.x.x.x)                 │  │  (ALB, RDS, S3, etc.) │
+    │  - Primary ENI (10.x.x.x)        │  │  - Primary CIDR (10.x.x.x)  │
+    │  - Secondary ENIs (100.x.x.x)    │  │                          │
+    └────────────────▲────────────────┘  └──────────▲──────────────┘
+                     │                               │
+      ┌──────────────┴──────────────┐   ┌───────────┴─────────────┐
+      │       Amazon VPC CNI         │   │    Route Table (VPC)   │
+      │ - Assigns Pod IPs from       │   │  - 100.x.x.x → local   │
+      │   Secondary CIDR (100.x.x.x) │   │  - 10.x.x.x → local    │
+      └──────────────────────────────┘   └────────────────────────┘
+                     ▲
+      ┌──────────────┴──────────────┐
+      │        Kubernetes Pods      │
+      │     (100.x.x.x CIDR)        │
+      │ - Assigned IPs via VPC CNI  │
+      │ - Communicates with Nodes & │
+      │   AWS services via routing  │
+      └──────────────────────────────┘
+📌 Traffic Flow in Architecture
+Request (100.x.x.x Pod → 10.x.x.x AWS Service)
+
+1️⃣ Pod (100.x.x.x) initiates a request.
+2️⃣ Traffic flows via the pod’s secondary ENI.
+3️⃣ Node routes traffic using VPC Route Table (local).
+4️⃣ Request reaches EC2, RDS, ALB, or any AWS service (10.x.x.x).
+
+Response (10.x.x.x AWS Service → 100.x.x.x Pod)
+
+5️⃣ AWS service sends response back to worker node.
+6️⃣ Node routes traffic back to the pod via the secondary ENI (100.x.x.x).
+7️⃣ Pod in 100.x.x.x receives the response.
