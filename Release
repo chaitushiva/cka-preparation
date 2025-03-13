@@ -1,0 +1,106 @@
+package main
+
+import (
+	"bytes"
+	"fmt"
+	"os"
+	"os/exec"
+	"regexp"
+	"strings"
+)
+
+// Get the current feature branch name
+func getCurrentBranch() (string, error) {
+	cmd := exec.Command("git", "rev-parse", "--abbrev-ref", "HEAD")
+	var out bytes.Buffer
+	cmd.Stdout = &out
+	err := cmd.Run()
+	if err != nil {
+		return "", err
+	}
+	return strings.TrimSpace(out.String()), nil
+}
+
+// Extract Jira Ticket Number from feature branch name
+func extractJiraTicket(branch string) (string, error) {
+	re := regexp.MustCompile(`(JIRA-\d+)`)
+	matches := re.FindStringSubmatch(branch)
+	if len(matches) < 2 {
+		return "", fmt.Errorf("Jira ticket number not found in branch name")
+	}
+	return matches[1], nil
+}
+
+// Get commit messages from the current feature branch that contain the Jira ticket number
+func getCommitMessages(branch, jiraTicket string) ([]string, error) {
+	cmd := exec.Command("git", "log", "--pretty=format:%s", fmt.Sprintf("origin/main..%s", branch))
+	var out bytes.Buffer
+	cmd.Stdout = &out
+	err := cmd.Run()
+	if err != nil {
+		return nil, err
+	}
+
+	commits := strings.Split(out.String(), "\n")
+	var filteredCommits []string
+	for _, commit := range commits {
+		if strings.Contains(commit, jiraTicket) {
+			filteredCommits = append(filteredCommits, commit)
+		}
+	}
+
+	return filteredCommits, nil
+}
+
+// Save release notes to a file
+func saveToFile(content string) error {
+	file, err := os.Create("release_notes.txt")
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	_, err = file.WriteString(content)
+	return err
+}
+
+func main() {
+	branch, err := getCurrentBranch()
+	if err != nil {
+		fmt.Println("Error getting current branch:", err)
+		return
+	}
+
+	jiraTicket, err := extractJiraTicket(branch)
+	if err != nil {
+		fmt.Println("Error extracting Jira ticket number:", err)
+		return
+	}
+
+	commits, err := getCommitMessages(branch, jiraTicket)
+	if err != nil {
+		fmt.Println("Error getting commit messages:", err)
+		return
+	}
+
+	// Format release notes
+	var releaseNotes strings.Builder
+	releaseNotes.WriteString("====================================\n")
+	releaseNotes.WriteString("           RELEASE NOTES           \n")
+	releaseNotes.WriteString("====================================\n")
+	releaseNotes.WriteString(fmt.Sprintf("**Feature Branch:** %s\n", branch))
+	releaseNotes.WriteString(fmt.Sprintf("**Jira Ticket:** %s\n", jiraTicket))
+	releaseNotes.WriteString("**Commits Included:**\n")
+	for _, commit := range commits {
+		releaseNotes.WriteString("- " + commit + "\n")
+	}
+
+	// Save to file
+	err = saveToFile(releaseNotes.String())
+	if err != nil {
+		fmt.Println("Error saving release notes to file:", err)
+		return
+	}
+
+	fmt.Println("Release notes saved to release_notes.txt")
+}
