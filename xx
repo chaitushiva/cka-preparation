@@ -1,0 +1,30 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nginx-dynamic-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/server-snippet: |
+      lua_shared_dict service_cache 10m;
+      access_by_lua_block {
+        local request_path = ngx.var.uri
+        local service_name = string.match(request_path, "^/([^/]+)/")
+        if service_name then
+          ngx.var.upstream_service = service_name .. "-svc"
+        else
+          ngx.var.upstream_service = "default-svc"
+        end
+      }
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      set $upstream_service default-svc;
+spec:
+  rules:
+  - host: "example.com"
+    http:
+      paths:
+      - path: "/"
+        pathType: Prefix
+        backend:
+          service:
+            name: "$upstream_service"
+            port:
+              number: 8081
